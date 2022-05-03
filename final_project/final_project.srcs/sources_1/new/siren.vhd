@@ -33,7 +33,8 @@ ARCHITECTURE Behavioral OF siren IS
 			wspeed : IN UNSIGNED (7 DOWNTO 0);
 			wclk : IN STD_LOGIC;
 			audio_clk : IN STD_LOGIC;
-			audio_data : OUT SIGNED (15 DOWNTO 0)
+			audio_data : OUT SIGNED (15 DOWNTO 0);
+			pitch_ctrl : in std_logic_vector (10 downto 0)
 		);
 	END COMPONENT;
 	SIGNAL tcount : unsigned (19 DOWNTO 0) := (OTHERS => '0'); -- timing counter
