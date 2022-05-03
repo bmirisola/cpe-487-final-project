@@ -12,7 +12,8 @@ ENTITY wail IS
 		wspeed : IN UNSIGNED (7 DOWNTO 0); -- speed of wail in pitch units/wclk
 		wclk : IN STD_LOGIC; -- wailing clock (47.6 Hz)
 		audio_clk : IN STD_LOGIC; -- audio sampling clock (48.8 kHz)
-	audio_data : OUT SIGNED (15 DOWNTO 0)); -- output audio sequence (wailing tone)
+	audio_data : OUT SIGNED (15 DOWNTO 0); -- output audio sequence (wailing tone)
+	pitch_ctrl : in std_logic_vector (10 downto 0));
 END wail;
 
 ARCHITECTURE Behavioral OF wail IS
@@ -20,7 +21,8 @@ ARCHITECTURE Behavioral OF wail IS
 		PORT (
 			clk : IN STD_LOGIC;
 			pitch : IN UNSIGNED (13 DOWNTO 0);
-			data : OUT SIGNED (15 DOWNTO 0)
+			data : OUT SIGNED (15 DOWNTO 0);
+		    pitch_adj : in std_logic_vector (10 downto 0)
 		);
 	END COMPONENT;
 	SIGNAL curr_pitch : UNSIGNED (13 DOWNTO 0); -- current wailing pitch
@@ -48,6 +50,7 @@ BEGIN
 	PORT MAP(
 		clk => audio_clk, -- instance a tone module
 		pitch => curr_pitch, -- use curr-pitch to modulate tone
-		data => audio_data
+		data => audio_data,
+		pitch_adj => pitch_ctrl
 		);
 END Behavioral;
