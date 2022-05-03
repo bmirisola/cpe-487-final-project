@@ -10,6 +10,7 @@ set_property -dict { PACKAGE_PIN G17 IOSTANDARD LVCMOS33 } [get_ports { dac_SDIN
 
 set_property -dict { PACKAGE_PIN C17 IOSTANDARD LVCMOS33 } [get_ports { dac_MCLK }]; #IO_L20N_T3_A19_15 Sch=ja[1]
 
+#Potentiometer Ports
 set_property -dict { PACKAGE_PIN F16 IOSTANDARD LVCMOS33 } [get_ports { ADC_SDATA1 }]; #IO_L21N_T3_DQS_A18_15 Sch=ja[2]
 set_property -dict { PACKAGE_PIN G16 IOSTANDARD LVCMOS33 } [get_ports { ADC_SDATA2 }]; #IO_L21P_T3_DQS_15 Sch=ja[3]
 set_property -dict { PACKAGE_PIN H14 IOSTANDARD LVCMOS33 } [get_ports { ADC_SCLK }]; #IO_L18N_T2_A23_15 Sch=ja[4]
