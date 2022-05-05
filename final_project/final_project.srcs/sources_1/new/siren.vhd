@@ -1,6 +1,7 @@
 library IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
+USE IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 ENTITY siren IS
 	PORT (
@@ -8,7 +9,11 @@ ENTITY siren IS
 		dac_MCLK : OUT STD_LOGIC; -- outputs to PMODI2L DAC
 		dac_LRCK : OUT STD_LOGIC;
 		dac_SCLK : OUT STD_LOGIC;
-		dac_SDIN : OUT STD_LOGIC
+		dac_SDIN : OUT STD_LOGIC;
+		ADC_CS : OUT STD_LOGIC; -- ADC signals
+        ADC_SCLK : OUT STD_LOGIC;
+        ADC_SDATA1 : IN STD_LOGIC;
+        ADC_SDATA2 : IN STD_LOGIC
 	);
 END siren;
 
@@ -16,6 +21,16 @@ ARCHITECTURE Behavioral OF siren IS
 	CONSTANT lo_tone : UNSIGNED (13 DOWNTO 0) := to_unsigned (344, 14); -- lower limit of siren = 256 Hz
 	CONSTANT hi_tone : UNSIGNED (13 DOWNTO 0) := to_unsigned (687, 14); -- upper limit of siren = 512 Hz
 	CONSTANT wail_speed : UNSIGNED (7 DOWNTO 0) := to_unsigned (8, 8); -- sets wailing speed
+	COMPONENT adc_if IS
+        PORT (
+            SCK : IN STD_LOGIC;
+            SDATA1 : IN STD_LOGIC;
+            SDATA2 : IN STD_LOGIC;
+            CS : IN STD_LOGIC;
+            data_1 : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+            data_2 : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
+        );
+    END COMPONENT;
 	COMPONENT dac_if IS
 		PORT (
 			SCLK : IN STD_LOGIC;
@@ -41,6 +56,10 @@ ARCHITECTURE Behavioral OF siren IS
 	SIGNAL data_L, data_R : SIGNED (15 DOWNTO 0); -- 16-bit signed audio data
 	SIGNAL dac_load_L, dac_load_R : STD_LOGIC; -- timing pulses to load DAC shift reg.
 	SIGNAL slo_clk, sclk, audio_CLK : STD_LOGIC;
+	signal adout : std_logic_vector (11 downto 0);
+	SIGNAL serial_clk, sample_clk : STD_LOGIC;
+    SIGNAL count : STD_LOGIC_VECTOR (9 DOWNTO 0);
+    SIGNAL batpos : STD_LOGIC_VECTOR (10 DOWNTO 0);
 BEGIN
 	-- this process sets up a 20 bit binary counter clocked at 50MHz. This is used
 	-- to generate all necessary timing signals. dac_load_L and dac_load_R are pulses
@@ -66,6 +85,20 @@ BEGIN
 	sclk <= tcount(4); -- serial data clock (1.56 MHz)
 	dac_SCLK <= sclk; -- also sent to DAC as SCLK
 	slo_clk <= tcount(19); -- clock to control wailing of tone (47.6 Hz)
+	serial_clk <= NOT count(4); -- 1.5 MHz serial clock for ADC
+    ADC_SCLK <= serial_clk;
+    sample_clk <= count(9); -- sampling clock is low for 16 SCLKs
+    ADC_CS <= sample_clk;    
+    batpos <= ("00" & adout(11 DOWNTO 3)) + adout(11 DOWNTO 4);
+	adc : adc_if
+    PORT MAP(-- instantiate ADC serial to parallel interface
+        SCK => serial_clk, 
+        CS => sample_clk, 
+        SDATA1 => ADC_SDATA1, 
+        SDATA2 => ADC_SDATA2, 
+        data_1 => OPEN, 
+        data_2 => adout 
+    );
 	dac : dac_if
 	PORT MAP(
 		SCLK => sclk, -- instantiate parallel to serial DAC interface
@@ -82,7 +115,8 @@ BEGIN
 			wspeed => wail_speed, 
 			wclk => slo_clk, 
 			audio_clk => audio_clk, 
-			audio_data => data_L
+			audio_data => data_L,
+			pitch_ctrl => batpos
 		);
 		data_R <= data_L; -- duplicate data on right channel
 END Behavioral;
