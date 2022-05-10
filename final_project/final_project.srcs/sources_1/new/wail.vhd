@@ -41,9 +41,9 @@ BEGIN
 			updn := '1'; -- if not, adjust updn
 		END IF;
 		IF updn = '1' THEN
-			curr_pitch <= curr_pitch + unsigned(pitch_ctrl(7 downto 0)); -- modulate pitch according to
+			curr_pitch <= curr_pitch + unsigned(pitch_ctrl(10 downto 3)); -- modulate pitch according to
 		ELSE
-			curr_pitch <= curr_pitch - unsigned(pitch_ctrl(7 downto 0)); -- current value of updn
+			curr_pitch <= curr_pitch - unsigned(pitch_ctrl(10 downto 3)); -- current value of updn
 		END IF;
 	END PROCESS;
 	tgen : tone
