@@ -9,7 +9,7 @@ ENTITY wail IS
 	PORT (
 		lo_pitch : IN UNSIGNED (13 DOWNTO 0); -- lowest pitch (in units of 0.745 Hz)
 		hi_pitch : IN UNSIGNED (13 DOWNTO 0); -- highest pitch (in units of 0.745 Hz)
-		wspeed : IN UNSIGNED (7 DOWNTO 0); -- speed of wail in pitch units/wclk
+		--wspeed : IN UNSIGNED (7 DOWNTO 0); -- speed of wail in pitch units/wclk
 		wclk : IN STD_LOGIC; -- wailing clock (47.6 Hz)
 		audio_clk : IN STD_LOGIC; -- audio sampling clock (48.8 kHz)
 	audio_data : OUT SIGNED (15 DOWNTO 0); -- output audio sequence (wailing tone)
@@ -21,8 +21,8 @@ ARCHITECTURE Behavioral OF wail IS
 		PORT (
 			clk : IN STD_LOGIC;
 			pitch : IN UNSIGNED (13 DOWNTO 0);
-			data : OUT SIGNED (15 DOWNTO 0);
-		    pitch_adj : in std_logic_vector (10 downto 0)
+			data : OUT SIGNED (15 DOWNTO 0)
+		    --pitch_adj : in std_logic_vector (10 downto 0)
 		);
 	END COMPONENT;
 	SIGNAL curr_pitch : UNSIGNED (13 DOWNTO 0); -- current wailing pitch
@@ -41,16 +41,16 @@ BEGIN
 			updn := '1'; -- if not, adjust updn
 		END IF;
 		IF updn = '1' THEN
-			curr_pitch <= curr_pitch + wspeed; -- modulate pitch according to
+			curr_pitch <= curr_pitch + unsigned(pitch_ctrl(7 downto 0)); -- modulate pitch according to
 		ELSE
-			curr_pitch <= curr_pitch - wspeed; -- current value of updn
+			curr_pitch <= curr_pitch - unsigned(pitch_ctrl(7 downto 0)); -- current value of updn
 		END IF;
 	END PROCESS;
 	tgen : tone
 	PORT MAP(
 		clk => audio_clk, -- instance a tone module
 		pitch => curr_pitch, -- use curr-pitch to modulate tone
-		data => audio_data,
-		pitch_adj => pitch_ctrl
+		data => audio_data
+		--pitch_adj => pitch_ctrl
 		);
 END Behavioral;

@@ -20,7 +20,7 @@ END siren;
 ARCHITECTURE Behavioral OF siren IS
 	CONSTANT lo_tone : UNSIGNED (13 DOWNTO 0) := to_unsigned (344, 14); -- lower limit of siren = 256 Hz
 	CONSTANT hi_tone : UNSIGNED (13 DOWNTO 0) := to_unsigned (687, 14); -- upper limit of siren = 512 Hz
-	CONSTANT wail_speed : UNSIGNED (7 DOWNTO 0) := to_unsigned (8, 8); -- sets wailing speed
+	--CONSTANT wail_speed : UNSIGNED (7 DOWNTO 0) := to_unsigned (8, 8); -- sets wailing speed
 	COMPONENT adc_if IS
         PORT (
             SCK : IN STD_LOGIC;
@@ -45,7 +45,7 @@ ARCHITECTURE Behavioral OF siren IS
 		PORT (
 			lo_pitch : IN UNSIGNED (13 DOWNTO 0);
 			hi_pitch : IN UNSIGNED (13 DOWNTO 0);
-			wspeed : IN UNSIGNED (7 DOWNTO 0);
+			--wspeed : IN UNSIGNED (7 DOWNTO 0);
 			wclk : IN STD_LOGIC;
 			audio_clk : IN STD_LOGIC;
 			audio_data : OUT SIGNED (15 DOWNTO 0);
@@ -78,6 +78,7 @@ BEGIN
 		ELSE dac_load_R <= '0';
 		END IF;
 		tcount <= tcount + 1;
+		count <= count + 1;
 	END PROCESS;
 	dac_MCLK <= NOT tcount(1); -- DAC master clock (12.5 MHz)
 	audio_CLK <= tcount(9); -- audio sampling rate (48.8 kHz)
@@ -112,7 +113,7 @@ BEGIN
 		PORT MAP(
 			lo_pitch => lo_tone, -- instantiate wailing siren
 			hi_pitch => hi_tone, 
-			wspeed => wail_speed, 
+			--wspeed => wail_speed, 
 			wclk => slo_clk, 
 			audio_clk => audio_clk, 
 			audio_data => data_L,
