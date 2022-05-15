@@ -14,7 +14,11 @@ The aim of this project was to create a simple way to change the frequency of an
 2. Run Synthesis
 3. Run Implementation
 4. Generate Bitstream
-5. Connect DAC and ADC to the corresponding ports on the FPGA
-6. Auto-connect the FPGA to the computer
-7. Program and run the code
+5. Connect DAC to Speaker and the JA port on the Nexys A7 Board
+6. Connect ADC to the Potentiometer and JB port on the Nexys A7 Board
+7. Auto-connect the FPGA to the computer
+8. Program and run the code
+
+## Demo:
+https://user-images.githubusercontent.com/40646481/168453721-e57f53fe-908c-4262-a353-6c434da0a8b0.mp4
 
